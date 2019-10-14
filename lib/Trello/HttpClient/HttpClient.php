@@ -337,7 +337,7 @@ class HttpClient implements HttpClientInterface
                         $query['token'] = $password;
 
                         $query = http_build_query($query);
-                        $request = $request->withUri($request->getUri()->withQuery($query));
+                        $request = $request->withUri($request->getUri()->withQuery(rawurldecode($query)));
                         break;
 
                     case Client::AUTH_URL_TOKEN:
