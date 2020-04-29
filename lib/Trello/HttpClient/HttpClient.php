@@ -9,6 +9,7 @@ use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Trello\Client;
+use Trello\Exception\ApiLimitExceedException;
 use Trello\Exception\ErrorException;
 use Trello\Exception\RuntimeException;
 use Trello\HttpClient\Listener\AuthListener;
@@ -211,9 +212,9 @@ class HttpClient implements HttpClientInterface
         try {
             $response = $this->client->send($request, $options);
         } catch (\LogicException $e) {
-            throw new ErrorException($e->getMessage(), $e->getCode(), $e);
+            throw new ErrorException($e->getMessage(), $e->getCode());
         } catch (\RuntimeException $e) {
-            throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
+            throw new RuntimeException($e->getMessage(), $e->getCode());
         }
 
         $this->lastRequest = $request;
@@ -234,18 +235,18 @@ class HttpClient implements HttpClientInterface
 
                         switch ($response->getStatusCode()) {
                             case 429:
-                                throw new ApiLimitExceedException('Wait a second.', 429);
+                                throw new \Trello\Exception\ApiLimitExceedException('Wait a second.', 429);
                                 break;
                         }
 
-                        $content = ResponseMediator::getContent($response);
+                        $content = \Trello\Exception\ResponseMediator::getContent($response);
                         if (is_array($content) && isset($content['message'])) {
                             if (400 == $response->getStatusCode()) {
                                 throw new ErrorException($content['message'], 400);
                             }
 
                             if (401 == $response->getStatusCode()) {
-                                throw new PermissionDeniedException($content['message'], 401);
+                                throw new \Trello\Exception\PermissionDeniedException($content['message'], 401);
                             }
 
                             if (422 == $response->getStatusCode() && isset($content['errors'])) {
@@ -275,11 +276,11 @@ class HttpClient implements HttpClientInterface
                                     }
                                 }
 
-                                throw new ValidationFailedException('Validation Failed: ' . implode(', ', $errors), 422);
+                                throw new \Trello\Exception\ValidationFailedException('Validation Failed: ' . implode(', ', $errors), 422);
                             }
                         }
 
-                        throw new RuntimeException(isset($content['message']) ? $content['message'] : $content, $response->getStatusCode());
+                        throw new \RuntimeException(isset($content['message']) ? $content['message'] : $content, $response->getStatusCode());
                     }
                 );
             };
