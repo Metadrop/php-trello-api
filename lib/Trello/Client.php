@@ -67,6 +67,7 @@ class Client implements ClientInterface
         'api_limit'   => 5000,
         'api_version' => 1,
         'cache_dir'   => null,
+        'curl'        => [CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2_0],
     );
 
     /**
