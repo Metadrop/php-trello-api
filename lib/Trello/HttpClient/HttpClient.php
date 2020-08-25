@@ -239,7 +239,7 @@ class HttpClient implements HttpClientInterface
                                 break;
                         }
 
-                        $content = \Trello\Exception\ResponseMediator::getContent($response);
+                        $content = \Trello\HttpClient\Message\ResponseMediator::getContent($response);
                         if (is_array($content) && isset($content['message'])) {
                             if (400 == $response->getStatusCode()) {
                                 throw new ErrorException($content['message'], 400);
